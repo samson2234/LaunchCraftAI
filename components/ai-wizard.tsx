@@ -93,6 +93,10 @@ export function AIWizard({ projectId, projectName, children }: AIWizardProps) {
                 {children}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden border-none shadow-2xl">
+                <DialogHeader className="sr-only">
+                    <DialogTitle>AI Launch Wizard</DialogTitle>
+                    <DialogDescription>Generate startup assets with AI</DialogDescription>
+                </DialogHeader>
                 <div className="bg-gradient-to-br from-gray-900 to-primary p-8 text-white relative overflow-hidden">
                     <div className="relative z-10 flex items-center space-x-3">
                         <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm">
@@ -199,10 +203,38 @@ export function AIWizard({ projectId, projectName, children }: AIWizardProps) {
                                 <p className="text-gray-500 font-medium mb-10 max-w-xs">Everything has been generated. You can now preview and edit your assets.</p>
 
                                 <div className="grid grid-cols-1 w-full gap-3">
-                                    <Button size="lg" className="w-full h-12 font-bold" onClick={() => { setOpen(false); router.refresh(); }}>
-                                        Go to Dashboard
+                                    <Button
+                                        size="lg"
+                                        className="w-full h-14 bg-gradient-to-r from-primary to-purple-600 font-black shadow-xl shadow-primary/20 rounded-2xl"
+                                        onClick={() => {
+                                            setOpen(false);
+                                            window.open(`/lp/${projectId}`, '_blank');
+                                            router.refresh();
+                                        }}
+                                    >
+                                        <Layout className="mr-2 h-5 w-5" />
+                                        Open My Website (New Tab)
                                     </Button>
-                                    <Button size="lg" variant="outline" className="w-full h-12 font-bold border-gray-100" onClick={() => setStep("SELECT")}>
+
+                                    <div className="grid grid-cols-2 gap-3 w-full">
+                                        <Button
+                                            size="lg"
+                                            variant="outline"
+                                            className="h-12 font-bold border-gray-100 rounded-xl"
+                                            onClick={() => {
+                                                const url = `${window.location.origin}/lp/${projectId}`;
+                                                navigator.clipboard.writeText(url);
+                                                alert("Link copied to clipboard!");
+                                            }}
+                                        >
+                                            Copy Public Link
+                                        </Button>
+                                        <Button size="lg" variant="outline" className="h-12 font-bold border-gray-100 rounded-xl" onClick={() => { setOpen(false); router.refresh(); }}>
+                                            Go to Studio
+                                        </Button>
+                                    </div>
+
+                                    <Button size="lg" variant="ghost" className="w-full h-12 font-bold text-gray-400 mt-2" onClick={() => setStep("SELECT")}>
                                         Generate More
                                     </Button>
                                 </div>

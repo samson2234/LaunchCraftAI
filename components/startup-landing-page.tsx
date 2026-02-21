@@ -105,6 +105,28 @@ export default function StartupLandingPage({ project }: PublicLandingPageProps) 
         }
     }
 
+    if (content.rawCode) {
+        return (
+            <div className="fixed inset-0 w-screen h-screen bg-white">
+                <iframe
+                    srcDoc={content.rawCode}
+                    className="w-full h-full border-none"
+                    title={project.name}
+                />
+
+                {/* Floating Feedback/Admin Link for Project Owner (optional, but good for UX) */}
+                <div className="fixed bottom-6 right-6 z-50">
+                    <Button variant="outline" className="rounded-full shadow-2xl bg-white/80 backdrop-blur-md font-bold" asChild>
+                        <a href={`/dashboard/projects/${project.id}`}>
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            Back to Studio
+                        </a>
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-white font-sans selection:bg-primary selection:text-white">
             {/* Navigation */}

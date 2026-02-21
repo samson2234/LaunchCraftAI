@@ -36,6 +36,13 @@ export class SubscriptionRepository {
             data,
         });
     }
+
+    async list() {
+        return prisma.subscription.findMany({
+            include: { user: true },
+            orderBy: { updatedAt: "desc" },
+        });
+    }
 }
 
 export const subscriptionRepository = new SubscriptionRepository();

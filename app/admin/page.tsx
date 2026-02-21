@@ -73,14 +73,16 @@ export default async function AdminDashboardPage() {
                             <CardTitle className="text-xl">Recent Users</CardTitle>
                             <CardDescription>Latest founder signups</CardDescription>
                         </div>
-                        <Button variant="ghost" size="sm" className="font-bold text-primary">Manage Users</Button>
+                        <Link href="/admin/users">
+                            <Button variant="ghost" size="sm" className="font-bold text-primary">Manage Users</Button>
+                        </Link>
                     </CardHeader>
                     <CardContent className="p-0">
                         <div className="divide-y divide-gray-50">
                             {recentUsers.map((user) => (
                                 <div key={user.id} className="p-6 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
                                     <div className="flex items-center space-x-4">
-                                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-500">
+                                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-400">
                                             {user.name?.charAt(0) || user.email.charAt(0)}
                                         </div>
                                         <div>
@@ -89,8 +91,8 @@ export default async function AdminDashboardPage() {
                                         </div>
                                     </div>
                                     <div className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${user.subscription?.plan === "GROWTH" ? "bg-purple-100 text-purple-600" :
-                                            user.subscription?.plan === "PRO" ? "bg-blue-100 text-blue-600" :
-                                                "bg-gray-100 text-gray-600"
+                                        user.subscription?.plan === "PRO" ? "bg-blue-100 text-blue-600" :
+                                            "bg-gray-100 text-gray-600"
                                         }`}>
                                         {user.subscription?.plan || "FREE"}
                                     </div>
@@ -100,35 +102,43 @@ export default async function AdminDashboardPage() {
                     </CardContent>
                 </Card>
 
-                {/* Recent Projects Section */}
+                {/* Revenue Breakdown */}
                 <Card className="border-none shadow-sm overflow-hidden">
                     <CardHeader className="bg-gray-50/50 border-b border-gray-100 p-6 flex flex-row items-center justify-between">
                         <div>
-                            <CardTitle className="text-xl">Recent Projects</CardTitle>
-                            <CardDescription>Latest startup assets generated</CardDescription>
+                            <CardTitle className="text-xl">Revenue Breakdown</CardTitle>
+                            <CardDescription>Subscription plan distribution</CardDescription>
                         </div>
-                        <Button variant="ghost" size="sm" className="font-bold text-primary">Manage Projects</Button>
+                        <Link href="/admin/subscriptions">
+                            <Button variant="ghost" size="sm" className="font-bold text-primary">View Revenue</Button>
+                        </Link>
                     </CardHeader>
-                    <CardContent className="p-0">
-                        <div className="divide-y divide-gray-50">
-                            {recentProjects.map((project) => (
-                                <div key={project.id} className="p-6 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
-                                    <div className="flex items-center space-x-4">
-                                        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
-                                            <Rocket className="w-6 h-6" />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-gray-900">{project.name}</h4>
-                                            <p className="text-sm text-gray-500">by {project.user.email}</p>
-                                        </div>
+                    <CardContent className="p-8">
+                        <div className="space-y-6">
+                            {[
+                                { label: "Growth Plan ($99/mo)", count: await prisma.subscription.count({ where: { plan: "GROWTH", status: "ACTIVE" } }), color: "bg-purple-500" },
+                                { label: "Pro Plan ($29/mo)", count: await prisma.subscription.count({ where: { plan: "PRO", status: "ACTIVE" } }), color: "bg-blue-500" },
+                                { label: "Free Plan", count: await prisma.subscription.count({ where: { plan: "FREE" } }), color: "bg-gray-300" },
+                            ].map((row, i) => (
+                                <div key={i} className="space-y-2">
+                                    <div className="flex items-center justify-between text-sm font-bold">
+                                        <span className="text-gray-600">{row.label}</span>
+                                        <span className="text-gray-900">{row.count} users</span>
                                     </div>
-                                    <Link href={`/dashboard/projects/${project.id}`}>
-                                        <Button variant="outline" size="sm" className="font-bold rounded-xl border-gray-200">
-                                            Inspector <ChevronRight className="ml-1 w-4 h-4" />
-                                        </Button>
-                                    </Link>
+                                    <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                                        <div
+                                            className={`${row.color} h-full rounded-full`}
+                                            style={{ width: `${Math.min(100, (row.count / userCount) * 100)}%` }}
+                                        />
+                                    </div>
                                 </div>
                             ))}
+                        </div>
+                        <div className="mt-8 p-6 bg-primary/5 rounded-3xl border border-primary/10">
+                            <p className="text-xs font-black uppercase tracking-widest text-primary/60 mb-1">Estimated MRR</p>
+                            <h3 className="text-3xl font-black text-primary">
+                                ${((await prisma.subscription.count({ where: { plan: "GROWTH", status: "ACTIVE" } }) * 99) + (await prisma.subscription.count({ where: { plan: "PRO", status: "ACTIVE" } }) * 29)).toLocaleString()}
+                            </h3>
                         </div>
                     </CardContent>
                 </Card>

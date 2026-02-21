@@ -22,7 +22,7 @@ export class ValidationService {
         });
     }
 
-    async validateWithAI(data: ValidateIdeaInput, userId: string) {
+    async validateWithAI(data: ValidateIdeaInput & { projectId?: string }, userId: string) {
         // Use AI to validate the idea
         const validation = await aiService.validateIdea({
             idea: data.idea,
@@ -31,6 +31,19 @@ export class ValidationService {
 
         if (!validation) {
             throw new Error("Failed to validate idea");
+        }
+
+        // Persist if projectId is available
+        if (data.projectId) {
+            await validationEntryRepository.create({
+                question: `Idea: ${data.idea}${data.targetMarket ? ` | Market: ${data.targetMarket}` : ''}`,
+                answer: "AI Validation Result",
+                score: validation.score || 0,
+                notes: JSON.stringify(validation),
+                project: {
+                    connect: { id: data.projectId },
+                },
+            });
         }
 
         return validation;

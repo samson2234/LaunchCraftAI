@@ -9,7 +9,8 @@ import {
     Maximize2,
     Download,
     Presentation,
-    Sparkles
+    Sparkles,
+    Loader2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -25,7 +26,9 @@ interface PitchDeckViewerProps {
 
 export function PitchDeckViewer({ pitchDeck }: PitchDeckViewerProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
-    const slides = (pitchDeck.slides as Slide[]) || [];
+    const [isRefining, setIsRefining] = useState(false);
+    const [refinePrompt, setRefinePrompt] = useState("");
+    const [slides, setSlides] = useState((pitchDeck.slides as Slide[]) || []);
 
     if (slides.length === 0) {
         return (
@@ -37,11 +40,63 @@ export function PitchDeckViewer({ pitchDeck }: PitchDeckViewerProps) {
         );
     }
 
+    async function handleRefine() {
+        if (!refinePrompt.trim()) return;
+        setIsRefining(true);
+        try {
+            const res = await fetch("/api/ai/refine", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    pitchDeckId: pitchDeck.id,
+                    instruction: refinePrompt
+                })
+            });
+
+            if (res.ok) {
+                const updated = await res.json();
+                setSlides(updated.slides);
+                setRefinePrompt("");
+            }
+        } catch (error) {
+            console.error("Refinement failed:", error);
+        } finally {
+            setIsRefining(false);
+        }
+    }
+
     const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
     const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
     return (
         <div className="space-y-6">
+            {/* AI Studio Bar */}
+            <div className="bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 p-1 rounded-2xl shadow-2xl relative group overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-primary/20 animate-pulse" />
+                <div className="bg-gray-900/90 backdrop-blur-xl p-4 rounded-xl relative z-10 flex items-center gap-4">
+                    <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                        <Sparkles className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1 relative">
+                        <input
+                            type="text"
+                            placeholder="Tell the AI to update the deck... (e.g., 'Make the solution slide more data-heavy' or 'Add a slide about competitive advantage')"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 outline-none focus:border-primary/50 transition-all font-medium"
+                            value={refinePrompt}
+                            onChange={(e) => setRefinePrompt(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleRefine()}
+                        />
+                    </div>
+                    <Button
+                        onClick={handleRefine}
+                        disabled={isRefining || !refinePrompt.trim()}
+                        className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-6 rounded-xl shadow-lg shadow-primary/20 disabled:opacity-50"
+                    >
+                        {isRefining ? <Loader2 className="w-5 h-5 animate-spin" /> : "Refine Slides"}
+                    </Button>
+                </div>
+            </div>
+
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="text-2xl font-black text-gray-900">{pitchDeck.title}</h3>

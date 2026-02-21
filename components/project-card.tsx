@@ -94,13 +94,21 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 </div>
             </CardContent>
 
-            <CardFooter className="bg-gray-50/30 p-4 border-t border-gray-100/50">
-                <Link href={`/dashboard/projects/${project.id}`} className="w-full">
-                    <Button variant="ghost" className="w-full justify-between hover:bg-primary/5 hover:text-primary group/btn">
-                        Open Project
+            <CardFooter className="bg-gray-50/30 p-4 border-t border-gray-100/50 flex items-center gap-3">
+                <Link href={`/dashboard/projects/${project.id}`} className="flex-1">
+                    <Button variant="ghost" className="w-full justify-between hover:bg-primary/5 hover:text-primary group/btn font-bold">
+                        Open Studio
                         <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
                     </Button>
                 </Link>
+                {project.landingPage && (
+                    <Button variant="outline" size="sm" className="h-9 px-4 border-emerald-100 bg-white text-emerald-700 hover:bg-emerald-50 font-bold rounded-xl shadow-sm whitespace-nowrap" asChild>
+                        <a href={`/lp/${project.id}`} target="_blank">
+                            <Layout className="mr-2 h-4 w-4" />
+                            View Live
+                        </a>
+                    </Button>
+                )}
             </CardFooter>
         </Card>
     );

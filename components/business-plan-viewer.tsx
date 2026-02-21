@@ -1,7 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useState } from "react";
 import {
+    Loader2,
     FileText,
     TrendingUp,
     Target,
@@ -9,17 +10,23 @@ import {
     Download,
     CheckCircle2,
     Calendar,
-    ChevronDown
+    ChevronDown,
+    Sparkles
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 interface BusinessPlanViewerProps {
     plan: any;
 }
 
 export function BusinessPlanViewer({ plan }: BusinessPlanViewerProps) {
-    if (!plan || !plan.executiveSummary) {
+    const [isRefining, setIsRefining] = useState(false);
+    const [refinePrompt, setRefinePrompt] = useState("");
+    const [content, setContent] = useState(plan);
+
+    if (!content || !content.executiveSummary) {
         return (
             <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center">
                 <FileText className="w-16 h-16 text-gray-200 mx-auto mb-4" />
@@ -29,21 +36,73 @@ export function BusinessPlanViewer({ plan }: BusinessPlanViewerProps) {
         );
     }
 
+    async function handleRefine() {
+        if (!refinePrompt.trim()) return;
+        setIsRefining(true);
+        try {
+            const res = await fetch("/api/ai/refine", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    businessPlanId: plan.id,
+                    instruction: refinePrompt
+                })
+            });
+
+            if (res.ok) {
+                const updated = await res.json();
+                setContent(updated);
+                setRefinePrompt("");
+            }
+        } catch (error) {
+            console.error("Refinement failed:", error);
+        } finally {
+            setIsRefining(false);
+        }
+    }
+
     const sections = [
-        { id: 'summary', title: 'Executive Summary', icon: Target, content: plan.executiveSummary },
-        { id: 'market', title: 'Market Analysis', icon: TrendingUp, content: plan.marketAnalysis },
-        { id: 'strategy', title: 'Growth Strategy', icon: Compass, content: plan.strategy },
-        { id: 'financial', title: 'Financial Outlook', icon: Calendar, content: plan.financialPlan },
+        { id: 'summary', title: 'Executive Summary', icon: Target, content: content.executiveSummary },
+        { id: 'market', title: 'Market Analysis', icon: TrendingUp, content: content.marketAnalysis },
+        { id: 'strategy', title: 'Growth Strategy', icon: Compass, content: content.strategy },
+        { id: 'financial', title: 'Financial Outlook', icon: Calendar, content: content.financialPlan },
     ];
 
     return (
         <div className="space-y-8 max-w-5xl mx-auto">
+            {/* AI Studio Bar */}
+            <div className="bg-gradient-to-r from-gray-900 via-indigo-900 to-gray-900 p-1 rounded-2xl shadow-2xl relative group overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-primary/20 animate-pulse" />
+                <div className="bg-gray-900/90 backdrop-blur-xl p-4 rounded-xl relative z-10 flex items-center gap-4">
+                    <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                        <Sparkles className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1 relative">
+                        <input
+                            type="text"
+                            placeholder="Instruct the AI strategist... (e.g., 'Include a competitor analysis in market section' or 'Detail a 3-month roadmap')"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-500 outline-none focus:border-primary/50 transition-all font-medium"
+                            value={refinePrompt}
+                            onChange={(e) => setRefinePrompt(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleRefine()}
+                        />
+                    </div>
+                    <Button
+                        onClick={handleRefine}
+                        disabled={isRefining || !refinePrompt.trim()}
+                        className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-6 rounded-xl shadow-lg shadow-primary/20 disabled:opacity-50"
+                    >
+                        {isRefining ? <Loader2 className="w-5 h-5 animate-spin" /> : "Refine Plan"}
+                    </Button>
+                </div>
+            </div>
+
             <div className="flex items-center justify-between pb-6 border-b border-gray-100">
                 <div>
                     <h3 className="text-3xl font-black text-gray-900 italic tracking-tight">Strategic Business Plan</h3>
                     <div className="flex items-center mt-2 space-x-3">
                         <Badge variant="secondary" className="bg-primary/5 text-primary border-none">AI Generated</Badge>
-                        <span className="text-sm text-gray-400 font-medium italic">Last updated: {new Date(plan.updatedAt).toLocaleDateString()}</span>
+                        <span className="text-sm text-gray-400 font-medium italic">Last updated: {new Date(content.updatedAt).toLocaleDateString()}</span>
                     </div>
                 </div>
                 <Button variant="outline" className="font-bold border-gray-200">

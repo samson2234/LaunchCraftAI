@@ -12,24 +12,32 @@ import {
     Presentation,
     CheckCircle,
     CreditCard,
-    LogOut
+    LogOut,
+    ShieldCheck,
+    BarChart
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { signOut } from "next-auth/react";
 
 const navItems = [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Projects", href: "/dashboard/projects", icon: Rocket },
-    { name: "Leads", href: "/dashboard/leads", icon: Users },
-    { name: "Idea Validation", href: "/dashboard/validation", icon: CheckCircle },
-    { name: "Pitch Decks", href: "/dashboard/pitch-deck", icon: Presentation },
-    { name: "Business Plans", href: "/dashboard/business-plan", icon: FileText },
+    { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
+    { name: "My Projects", href: "/dashboard/projects", icon: Rocket },
+    { name: "Lead CRM", href: "/dashboard/leads", icon: Users },
     { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
+const adminNavItems = [
+    { name: "Admin Home", href: "/admin", icon: ShieldCheck },
+    { name: "Users", href: "/admin/users", icon: Users },
+    { name: "Revenue", href: "/admin/subscriptions", icon: BarChart },
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+];
+
 export function Sidebar() {
     const pathname = usePathname();
+    const isAdminMode = pathname.startsWith("/admin");
+    const items = isAdminMode ? adminNavItems : navItems;
 
     return (
         <div className="flex flex-col h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 w-64 fixed left-0 top-0 bottom-0 z-50">
@@ -43,7 +51,7 @@ export function Sidebar() {
             </div>
 
             <nav className="flex-1 px-4 space-y-1 overflow-y-auto pt-4">
-                {navItems.map((item) => {
+                {items.map((item) => {
                     const isActive = pathname === item.href;
                     return (
                         <Link

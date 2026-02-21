@@ -12,7 +12,8 @@ import {
     ExternalLink,
     ChevronLeft,
     Sparkles,
-    Zap
+    Zap,
+    CheckCircle
 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,8 @@ import { AIWizard } from "@/components/ai-wizard";
 import { LandingPageEditor } from "@/components/landing-page-editor";
 import { PitchDeckViewer } from "@/components/pitch-deck-viewer";
 import { BusinessPlanViewer } from "@/components/business-plan-viewer";
+import { LeadsTable } from "@/components/leads-table";
+import { ValidationTracker } from "@/components/validation-tracker";
 import {
     Card,
     CardContent,
@@ -124,17 +127,17 @@ export default async function ProjectDetailsPage({
 
                 <div className="flex items-center gap-3">
                     {project.landingPage && (
-                        <Button variant="outline" className="bg-white border-gray-100 hover:bg-gray-50 font-semibold" asChild>
+                        <Button variant="outline" className="h-12 px-6 border-emerald-100 bg-emerald-50/30 text-emerald-700 hover:bg-emerald-100 font-bold rounded-2xl shadow-sm transition-all" asChild>
                             <a href={`/lp/${project.id}`} target="_blank">
-                                <ExternalLink className="mr-2 h-4 w-4" />
-                                View Live Page
+                                <Layout className="mr-2 h-5 w-5" />
+                                Preview Site
                             </a>
                         </Button>
                     )}
                     <AIWizard projectId={project.id} projectName={project.name}>
-                        <Button className="font-bold shadow-lg shadow-primary/20">
-                            <Sparkles className="mr-2 h-4 w-4" />
-                            Generate Content
+                        <Button className="h-12 px-6 font-bold shadow-xl shadow-primary/20 rounded-2xl bg-gradient-to-r from-primary to-purple-600 border-none hover:shadow-primary/40 transition-all">
+                            <Sparkles className="mr-2 h-5 w-5" />
+                            Launch AI Wizard
                         </Button>
                     </AIWizard>
                 </div>
@@ -149,6 +152,7 @@ export default async function ProjectDetailsPage({
                         { value: "leads", label: "Leads", icon: Users },
                         { value: "deck", label: "Pitch Deck", icon: Presentation },
                         { value: "plan", label: "Business Plan", icon: FileText },
+                        { value: "validation", label: "Validation", icon: CheckCircle }, // Added Validation tab
                         { value: "settings", label: "Settings", icon: Settings },
                     ].map((tab) => (
                         <TabsTrigger
@@ -184,16 +188,7 @@ export default async function ProjectDetailsPage({
                 </TabsContent>
 
                 <TabsContent value="leads" className="mt-0">
-                    <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center">
-                        <Users className="w-16 h-16 text-gray-200 mx-auto mb-4" />
-                        <h3 className="text-xl font-bold">{project._count?.leads || 0} Leads Captured</h3>
-                        <p className="text-gray-500 max-w-sm mx-auto mb-8 mt-2">
-                            {project._count?.leads ? "Download your leads as CSV and start your outreach campaign." : "When people sign up through your landing page, they'll appear here."}
-                        </p>
-                        <Button variant="outline" className="font-bold border-gray-200" disabled={!project._count?.leads}>
-                            Export CSV
-                        </Button>
-                    </div>
+                    <LeadsTable leads={project.leads || []} projectName={project.name} />
                 </TabsContent>
 
                 <TabsContent value="deck" className="mt-0">
@@ -211,6 +206,10 @@ export default async function ProjectDetailsPage({
                             </AIWizard>
                         </div>
                     )}
+                </TabsContent>
+
+                <TabsContent value="validation" className="mt-0">
+                    <ValidationTracker entries={project.validationEntries || []} projectName={project.name} />
                 </TabsContent>
 
                 <TabsContent value="plan" className="mt-0">

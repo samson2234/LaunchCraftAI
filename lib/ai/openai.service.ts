@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { SYSTEM_PROMPTS, getLandingPagePrompt, getPitchDeckPrompt, getBusinessPlanPrompt } from "./prompts";
+import { SYSTEM_PROMPTS, getLandingPagePrompt, getPitchDeckPrompt, getBusinessPlanPrompt, getRefineLandingPagePrompt, getRefinePitchDeckPrompt, getRefineBusinessPlanPrompt } from "./prompts";
 
 if (!process.env.OPENAI_API_KEY) {
     throw new Error("Missing OPENAI_API_KEY environment variable");
@@ -42,6 +42,34 @@ export class AIService {
     }
 
     /**
+     * Refine an existing landing page
+     */
+    async refineLandingPage(params: {
+        projectName: string;
+        currentContent: any;
+        instruction: string;
+    }) {
+        const response = await openai.chat.completions.create({
+            model: "gpt-4-turbo-preview",
+            messages: [
+                {
+                    role: "system",
+                    content: SYSTEM_PROMPTS.MARKETING_EXPERT,
+                },
+                {
+                    role: "user",
+                    content: getRefineLandingPagePrompt(params.projectName, params.currentContent, params.instruction)
+                },
+            ],
+            response_format: { type: "json_object" },
+            temperature: 0.7,
+        });
+
+        const content = response.choices[0].message.content;
+        return content ? JSON.parse(content) : null;
+    }
+
+    /**
      * Generate pitch deck slides
      */
     async generatePitchDeck(params: {
@@ -69,6 +97,34 @@ export class AIService {
     }
 
     /**
+     * Refine an existing pitch deck
+     */
+    async refinePitchDeck(params: {
+        projectName: string;
+        currentContent: any;
+        instruction: string;
+    }) {
+        const response = await openai.chat.completions.create({
+            model: "gpt-4-turbo-preview",
+            messages: [
+                {
+                    role: "system",
+                    content: SYSTEM_PROMPTS.INVESTOR_PRO,
+                },
+                {
+                    role: "user",
+                    content: getRefinePitchDeckPrompt(params.projectName, params.currentContent, params.instruction)
+                },
+            ],
+            response_format: { type: "json_object" },
+            temperature: 0.7,
+        });
+
+        const content = response.choices[0].message.content;
+        return content ? JSON.parse(content) : null;
+    }
+
+    /**
      * Generate business plan sections
      */
     async generateBusinessPlan(params: {
@@ -85,6 +141,34 @@ export class AIService {
                 {
                     role: "user",
                     content: getBusinessPlanPrompt(params.projectName, params.description)
+                },
+            ],
+            response_format: { type: "json_object" },
+            temperature: 0.7,
+        });
+
+        const content = response.choices[0].message.content;
+        return content ? JSON.parse(content) : null;
+    }
+
+    /**
+     * Refine an existing business plan
+     */
+    async refineBusinessPlan(params: {
+        projectName: string;
+        currentContent: any;
+        instruction: string;
+    }) {
+        const response = await openai.chat.completions.create({
+            model: "gpt-4-turbo-preview",
+            messages: [
+                {
+                    role: "system",
+                    content: SYSTEM_PROMPTS.STRATEGIST,
+                },
+                {
+                    role: "user",
+                    content: getRefineBusinessPlanPrompt(params.projectName, params.currentContent, params.instruction)
                 },
             ],
             response_format: { type: "json_object" },
