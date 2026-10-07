@@ -1,13 +1,20 @@
 import OpenAI from "openai";
 import { SYSTEM_PROMPTS, getLandingPagePrompt, getPitchDeckPrompt, getBusinessPlanPrompt, getRefineLandingPagePrompt, getRefinePitchDeckPrompt, getRefineBusinessPlanPrompt } from "./prompts";
 
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error("Missing OPENAI_API_KEY environment variable");
-}
+let client: OpenAI | undefined;
 
-export const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+/**
+ * Created on first use so a missing key fails the request, not the build.
+ */
+export function getOpenAI(): OpenAI {
+    if (!client) {
+        if (!process.env.OPENAI_API_KEY) {
+            throw new Error("Missing OPENAI_API_KEY environment variable");
+        }
+        client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    }
+    return client;
+}
 
 /**
  * AI Service for generating content
@@ -21,7 +28,7 @@ export class AIService {
         description: string;
         targetAudience?: string;
     }) {
-        const response = await openai.chat.completions.create({
+        const response = await getOpenAI().chat.completions.create({
             model: "gpt-4-turbo-preview",
             messages: [
                 {
@@ -49,7 +56,7 @@ export class AIService {
         currentContent: any;
         instruction: string;
     }) {
-        const response = await openai.chat.completions.create({
+        const response = await getOpenAI().chat.completions.create({
             model: "gpt-4-turbo-preview",
             messages: [
                 {
@@ -76,7 +83,7 @@ export class AIService {
         projectName: string;
         description: string;
     }) {
-        const response = await openai.chat.completions.create({
+        const response = await getOpenAI().chat.completions.create({
             model: "gpt-4-turbo-preview",
             messages: [
                 {
@@ -104,7 +111,7 @@ export class AIService {
         currentContent: any;
         instruction: string;
     }) {
-        const response = await openai.chat.completions.create({
+        const response = await getOpenAI().chat.completions.create({
             model: "gpt-4-turbo-preview",
             messages: [
                 {
@@ -131,7 +138,7 @@ export class AIService {
         projectName: string;
         description: string;
     }) {
-        const response = await openai.chat.completions.create({
+        const response = await getOpenAI().chat.completions.create({
             model: "gpt-4-turbo-preview",
             messages: [
                 {
@@ -159,7 +166,7 @@ export class AIService {
         currentContent: any;
         instruction: string;
     }) {
-        const response = await openai.chat.completions.create({
+        const response = await getOpenAI().chat.completions.create({
             model: "gpt-4-turbo-preview",
             messages: [
                 {
@@ -203,7 +210,7 @@ Provide a JSON response with:
   "competitiveLandscape": "Description of competition"
 }`;
 
-        const response = await openai.chat.completions.create({
+        const response = await getOpenAI().chat.completions.create({
             model: "gpt-4-turbo-preview",
             messages: [
                 {

@@ -186,7 +186,7 @@ export default function StartupLandingPage({ project }: PublicLandingPageProps) 
                                     {success ? (
                                         <div className="py-4 text-emerald-600 font-bold flex items-center justify-center space-x-2">
                                             <Check className="w-6 h-6" />
-                                            <span>You're on the list! We'll be in touch.</span>
+                                            <span>You&apos;re on the list! We&apos;ll be in touch.</span>
                                         </div>
                                     ) : (
                                         <div className="flex flex-col sm:flex-row gap-3">
@@ -289,7 +289,7 @@ export default function StartupLandingPage({ project }: PublicLandingPageProps) 
                 {/* Testimonials */}
                 <section className="py-24 bg-gray-900 text-white overflow-hidden">
                     <div className="max-w-7xl mx-auto px-6">
-                        <h2 className="text-3xl font-black mb-16 text-center italic">"The most impressive startup builder I've ever used."</h2>
+                        <h2 className="text-3xl font-black mb-16 text-center italic">&quot;The most impressive startup builder I&apos;ve ever used.&quot;</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                             {testimonials.map((t: Testimonial, i: number) => (
                                 <div key={i} className="flex items-start space-x-6">
@@ -299,7 +299,7 @@ export default function StartupLandingPage({ project }: PublicLandingPageProps) 
                                             <Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" />
                                         </div>
                                         <p className="text-white/80 font-medium leading-relaxed mb-4 italic">
-                                            "{t.text}"
+                                            &quot;{t.text}&quot;
                                         </p>
                                         <h4 className="font-bold">{t.name}</h4>
                                         <p className="text-white/40 text-sm">{t.role}</p>

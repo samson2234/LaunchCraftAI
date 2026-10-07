@@ -65,7 +65,7 @@ export function Testimonials() {
                             </div>
                             <Quote className="absolute top-6 right-8 w-12 h-12 text-gray-200/50 -z-0" />
                             <p className="text-gray-700 font-medium leading-relaxed mb-8 relative z-10">
-                                "{t.content}"
+                                &quot;{t.content}&quot;
                             </p>
                             <div className="flex items-center space-x-4">
                                 <img src={t.avatar} alt={t.author} className="w-12 h-12 rounded-full ring-2 ring-white shadow-sm" />

@@ -1,13 +1,22 @@
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error("Missing STRIPE_SECRET_KEY environment variable");
-}
+let client: Stripe | undefined;
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2024-12-18.acacia",
-    typescript: true,
-});
+/**
+ * Created on first use so a missing key fails the request, not the build.
+ */
+function getStripe(): Stripe {
+    if (!client) {
+        if (!process.env.STRIPE_SECRET_KEY) {
+            throw new Error("Missing STRIPE_SECRET_KEY environment variable");
+        }
+        client = new Stripe(process.env.STRIPE_SECRET_KEY, {
+            apiVersion: "2025-02-24.acacia",
+            typescript: true,
+        });
+    }
+    return client;
+}
 
 /**
  * Stripe Service for payment processing
@@ -17,7 +26,7 @@ export class StripeService {
      * Create a Stripe customer
      */
     async createCustomer(params: { email: string; name?: string }) {
-        return await stripe.customers.create({
+        return await getStripe().customers.create({
             email: params.email,
             name: params.name,
             metadata: {
@@ -36,7 +45,7 @@ export class StripeService {
         cancelUrl: string;
         userId: string;
     }) {
-        return await stripe.checkout.sessions.create({
+        return await getStripe().checkout.sessions.create({
             customer: params.customerId,
             mode: "subscription",
             payment_method_types: ["card"],
@@ -61,7 +70,7 @@ export class StripeService {
         customerId: string;
         returnUrl: string;
     }) {
-        return await stripe.billingPortal.sessions.create({
+        return await getStripe().billingPortal.sessions.create({
             customer: params.customerId,
             return_url: params.returnUrl,
         });
@@ -71,14 +80,14 @@ export class StripeService {
      * Get subscription details
      */
     async getSubscription(subscriptionId: string) {
-        return await stripe.subscriptions.retrieve(subscriptionId);
+        return await getStripe().subscriptions.retrieve(subscriptionId);
     }
 
     /**
      * Cancel subscription
      */
     async cancelSubscription(subscriptionId: string) {
-        return await stripe.subscriptions.cancel(subscriptionId);
+        return await getStripe().subscriptions.cancel(subscriptionId);
     }
 
     /**
@@ -88,11 +97,11 @@ export class StripeService {
         subscriptionId: string;
         priceId: string;
     }) {
-        const subscription = await stripe.subscriptions.retrieve(
+        const subscription = await getStripe().subscriptions.retrieve(
             params.subscriptionId
         );
 
-        return await stripe.subscriptions.update(params.subscriptionId, {
+        return await getStripe().subscriptions.update(params.subscriptionId, {
             items: [
                 {
                     id: subscription.items.data[0].id,
@@ -112,7 +121,7 @@ export class StripeService {
             throw new Error("Missing STRIPE_WEBHOOK_SECRET environment variable");
         }
 
-        return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+        return getStripe().webhooks.constructEvent(payload, signature, webhookSecret);
     }
 }
 

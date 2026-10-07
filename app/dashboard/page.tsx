@@ -168,7 +168,7 @@ export default async function DashboardPage() {
                         </CardHeader>
                         <CardContent>
                             <p className="text-sm text-gray-600 leading-relaxed italic">
-                                "The best time to start was yesterday. The second best time is right now. Use our AI to build your MVP in minutes instead of weeks."
+                                &quot;The best time to start was yesterday. The second best time is right now. Use our AI to build your MVP in minutes instead of weeks.&quot;
                             </p>
                             <div className="mt-4 flex items-center text-sm font-bold text-primary group-hover:translate-x-1 transition-transform cursor-pointer">
                                 Read more guide

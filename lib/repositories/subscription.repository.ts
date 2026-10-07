@@ -2,12 +2,12 @@ import { prisma } from "@/lib/db";
 import { Plan, SubscriptionStatus } from "@prisma/client";
 
 export interface UpdateSubscriptionData {
-    stripeCustomerId?: string;
-    stripeSubscriptionId?: string;
-    stripePriceId?: string;
+    stripeCustomerId?: string | null;
+    stripeSubscriptionId?: string | null;
+    stripePriceId?: string | null;
     plan?: Plan;
     status?: SubscriptionStatus;
-    currentPeriodEnd?: Date;
+    currentPeriodEnd?: Date | null;
 }
 
 export class SubscriptionRepository {

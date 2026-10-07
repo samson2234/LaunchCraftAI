@@ -113,14 +113,14 @@ export default async function AdminUsersPage() {
                                             <DropdownMenuLabel className="font-bold text-xs uppercase tracking-widest text-gray-400 px-3 py-2">Account Actions</DropdownMenuLabel>
                                             <DropdownMenuItem className="rounded-xl px-3 py-2 font-bold focus:bg-primary/5 focus:text-primary cursor-pointer">
                                                 <UserIcon className="mr-2 h-4 w-4" /> View Profile
-                                            </MenuItem>
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem className="rounded-xl px-3 py-2 font-bold focus:bg-primary/5 focus:text-primary cursor-pointer">
                                                 <ShieldCheck className="mr-2 h-4 w-4" /> Manage Permissions
-                                            </MenuItem>
+                                            </DropdownMenuItem>
                                             <DropdownMenuSeparator className="bg-gray-100 my-1" />
                                             <DropdownMenuItem className="rounded-xl px-3 py-2 font-bold text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                                                 <Trash2 className="mr-2 h-4 w-4" /> Suspend Account
-                                            </MenuItem>
+                                            </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>
