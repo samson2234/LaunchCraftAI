@@ -60,7 +60,7 @@ export default async function ProjectsPage() {
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900">No projects yet</h3>
                     <p className="text-gray-500 max-w-sm mx-auto mt-2 mb-8 text-lg">
-                        You haven't created any startup projects yet. Let's launch your first idea today!
+                        You haven&apos;t created any startup projects yet. Let&apos;s launch your first idea today!
                     </p>
                     <CreateProjectModal>
                         <Button size="lg" className="px-12 font-bold h-14 text-lg">
